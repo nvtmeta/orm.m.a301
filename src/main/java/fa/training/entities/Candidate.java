@@ -7,6 +7,7 @@ import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -62,5 +63,13 @@ public class Candidate {
 
     @Column(name = "remark", columnDefinition = "varchar(1000)", nullable = false)
     private String remark;
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<Interview> interviews;
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<EntryTest> entryTests;
 
 }
