@@ -27,7 +27,7 @@ public class EntryTest {
     @Column(name = "time", columnDefinition = "varchar(255)", nullable = false)
     private String time;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "date", columnDefinition = "date", nullable = false)
     private LocalDate date;
 
     @Column(name = "language_valuator", columnDefinition = "varchar(255)", nullable = false)

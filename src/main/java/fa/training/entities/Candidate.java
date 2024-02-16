@@ -2,6 +2,7 @@ package fa.training.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -25,9 +26,11 @@ public class Candidate {
     private Integer id;
 
     @Column(name = "full_name", columnDefinition = "varchar(255)", nullable = false)
+    @NotNull
     private String fullName;
 
     @Column(name = "date_of_birth", nullable = false)
+    @NotNull
     private LocalDate dateOfBirth;
 
     //    gender: accepts value 0 (female) and 1 (male) only.
@@ -36,12 +39,17 @@ public class Candidate {
     private Integer gender;
 
     @Column(name = "graduation_year", nullable = false)
+    @NotNull
     private LocalDate graduationYear;
 
     @Column(name = "phone", columnDefinition = "varchar(255)", nullable = false, unique = true)
+    @UniqueElements
+    @NotNull
     private String phone;
 
     @Column(name = "email", columnDefinition = "varchar(255)", nullable = false, unique = true)
+    @UniqueElements
+    @NotNull
     private String email;
 
     //o level: skill level of candidate (accepts value range from 1 to 7 only)
