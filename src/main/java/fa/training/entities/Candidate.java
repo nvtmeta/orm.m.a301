@@ -54,13 +54,13 @@ public class Candidate {
 
     //o level: skill level of candidate (accepts value range from 1 to 7 only)
     @Column(name = "skill", columnDefinition = "varchar(255)", nullable = false)
-    @Range(min = 1, max = 7)
     private String skill;
 
     @Column(name = "foreign_language", columnDefinition = "varchar(255)", nullable = false)
     private String foreignLanguage;
 
     @Column(name = "level", columnDefinition = "int", nullable = false)
+    @Range(min = 1, max = 7)
     private Integer level;
 
     @Column(name = "cv", columnDefinition = "varchar(255)", nullable = false)

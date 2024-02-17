@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,9 +36,9 @@ public class CandidateDaoTest {
                 .graduationYear(LocalDate.now())
                 .phone("test")
                 .email("test")
-                .skill("2")
+                .skill("test")
                 .foreignLanguage("test")
-                .level(0)
+                .level(3)
                 .cv("test")
                 .allocationStatus(0)
                 .remark("test")
@@ -143,6 +144,64 @@ public class CandidateDaoTest {
             candidateDao.removeById(candidate.getId());
         });
     }
+
+
+    @Test
+    public void testFullNameNotNull() {
+        Candidate candidate = candidateDao.getById(13);
+        assertNotNull(candidate.getFullName());
+    }
+
+    @Test
+    public void testDateOfBirthNotNull() {
+        Candidate candidate = candidateDao.getById(13);
+        assertNotNull(candidate.getDateOfBirth());
+    }
+
+    @Test
+    public void testGraduationYearNotNull() {
+        Candidate candidate = candidateDao.getById(13);
+        assertNotNull(candidate.getGraduationYear());
+    }
+
+    @Test
+    public void testPhoneNotNull() {
+        Candidate candidate = candidateDao.getById(13);
+        assertNotNull(candidate.getPhone());
+    }
+
+    @Test
+    public void testEmailNotNull() {
+        Candidate candidate = candidateDao.getById(13);
+        assertNotNull(candidate.getEmail());
+    }
+
+    @Test
+    public void testPhoneUnique() {
+        Candidate candidate = candidateDao.getById(13);
+        Set<String> existingPhones = candidateDao.getAll().stream().map(Candidate::getPhone).collect(Collectors.toSet());
+        assertFalse(existingPhones.contains(candidate.getPhone()));
+    }
+
+    @Test
+    public void testEmailUnique() {
+        Candidate candidate = candidateDao.getById(13);
+        Set<String> existingEmails = candidateDao.getAll().stream().map(Candidate::getEmail).collect(Collectors.toSet());
+        assertFalse(existingEmails.contains(candidate.getEmail()));
+    }
+
+    @Test
+    public void testGenderValidValues() {
+        Candidate candidate = candidateDao.getById(13);
+        assertTrue(candidate.getGender() == 0 || candidate.getGender() == 1);
+    }
+
+    @Test
+    public void testLevelValidRange() {
+        Candidate candidate = candidateDao.getById(13);
+        assertTrue(candidate.getLevel() >= 1 && candidate.getLevel() <= 7);
+    }
+
 
 
 }
