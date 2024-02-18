@@ -3,6 +3,8 @@ package fa.training.entities;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
@@ -33,8 +35,9 @@ public class EntryTest {
     @Column(name = "language_valuator", columnDefinition = "varchar(255)", nullable = false)
     private String languageValuator;
 
-    @Range(min = 0, max = 10)
     @Column(name = "language_result", columnDefinition = "varchar(255)", nullable = false)
+    @Min(0)
+    @Max(10)
     private String languageResult;
 
     @Column(name = "technical_valuator", columnDefinition = "varchar(255)", nullable = false)

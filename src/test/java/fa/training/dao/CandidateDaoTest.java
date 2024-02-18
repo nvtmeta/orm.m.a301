@@ -4,6 +4,8 @@ import fa.training.dao.impl.CandidateDaoImpl;
 import fa.training.entities.Candidate;
 import fa.training.entities.EntryTest;
 import fa.training.entities.Interview;
+import jakarta.validation.ConstraintViolation;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -30,18 +32,18 @@ public class CandidateDaoTest {
     @Test
     public void testSave() {
         Candidate candidate = Candidate.builder()
-                .fullName("test")
+                .fullName("Bill")
                 .dateOfBirth(LocalDate.now())
                 .gender(0)
                 .graduationYear(LocalDate.now())
-                .phone("test")
-                .email("test")
-                .skill("test")
-                .foreignLanguage("test")
+                .phone("3234234")
+                .email("Bill@gmail.com")
+                .skill("dotnet")
+                .foreignLanguage("china")
                 .level(3)
-                .cv("test")
+                .cv("bill.cv")
                 .allocationStatus(0)
-                .remark("test")
+                .remark("normal")
                 .build();
 
 
@@ -145,63 +147,224 @@ public class CandidateDaoTest {
         });
     }
 
+//    abnormal case
+
 
     @Test
     public void testFullNameNotNull() {
-        Candidate candidate = candidateDao.getById(13);
-        assertNotNull(candidate.getFullName());
+//        create new candidate
+        Candidate candidate = Candidate.builder()
+                .fullName("Jack")
+                .dateOfBirth(LocalDate.now())
+                .gender(0)
+                .graduationYear(LocalDate.now())
+                .phone("0112255")
+                .email("jack@gmail.com")
+                .skill("java")
+                .foreignLanguage("english")
+                .level(3)
+                .cv("jack.cv")
+                .allocationStatus(0)
+                .remark("good")
+                .build();
+
+        candidateDao.save(candidate);
+
+
+        List<Candidate> candidates = candidateDao.getAll();
+        candidates.forEach(c -> {
+            assertNotNull(c.getFullName());
+        });
+
     }
 
     @Test
     public void testDateOfBirthNotNull() {
-        Candidate candidate = candidateDao.getById(13);
-        assertNotNull(candidate.getDateOfBirth());
+        List<Candidate> candidates = candidateDao.getAll();
+        candidates.forEach(c -> {
+            assertNotNull(c.getDateOfBirth());
+        });
     }
 
     @Test
     public void testGraduationYearNotNull() {
-        Candidate candidate = candidateDao.getById(13);
-        assertNotNull(candidate.getGraduationYear());
+        List<Candidate> candidates = candidateDao.getAll();
+        candidates.forEach(c -> {
+            assertNotNull(c.getGraduationYear());
+        });
+
     }
 
     @Test
     public void testPhoneNotNull() {
-        Candidate candidate = candidateDao.getById(13);
-        assertNotNull(candidate.getPhone());
+        List<Candidate> candidates = candidateDao.getAll();
+        candidates.forEach(c -> {
+            assertNotNull(c.getPhone());
+        });
     }
 
     @Test
     public void testEmailNotNull() {
-        Candidate candidate = candidateDao.getById(13);
-        assertNotNull(candidate.getEmail());
+        List<Candidate> candidates = candidateDao.getAll();
+        candidates.forEach(c -> {
+            assertNotNull(c.getEmail());
+        });
     }
+
 
     @Test
     public void testPhoneUnique() {
-        Candidate candidate = candidateDao.getById(13);
-        Set<String> existingPhones = candidateDao.getAll().stream().map(Candidate::getPhone).collect(Collectors.toSet());
-        assertFalse(existingPhones.contains(candidate.getPhone()));
+
+        List<Candidate> candidateList = candidateDao.getAll();
+        Set<String> existingPhones = new HashSet<>();
+        candidateList.forEach(candidate -> {
+            assertFalse(existingPhones.contains(candidate.getPhone()));
+            existingPhones.add(candidate.getPhone());
+        });
+    }
+
+    @Test
+    public void testPhoneDuplicate() {
+//        find candidate existed
+        Candidate candidate = candidateDao.getAll().getFirst();
+        Candidate candidate2 = Candidate.builder()
+                .fullName("test")
+                .dateOfBirth(LocalDate.now())
+                .gender(0)
+                .graduationYear(LocalDate.now())
+                .phone(candidate.getPhone())
+                .email("test@gmail.com")
+                .skill("java")
+                .foreignLanguage("english")
+                .level(3)
+                .cv("test.cv")
+                .allocationStatus(0)
+                .remark("good")
+                .build();
+        assertThrows(Exception.class, () -> {
+            candidateDao.save(candidate2);
+        });
+
     }
 
     @Test
     public void testEmailUnique() {
-        Candidate candidate = candidateDao.getById(13);
-        Set<String> existingEmails = candidateDao.getAll().stream().map(Candidate::getEmail).collect(Collectors.toSet());
-        assertFalse(existingEmails.contains(candidate.getEmail()));
+        List<Candidate> candidateList = candidateDao.getAll();
+
+        Set<String> existingEmails = new HashSet<>();
+
+        candidateList.forEach(candidate -> {
+            assertFalse(existingEmails.contains(candidate.getEmail()));
+            existingEmails.add(candidate.getEmail());
+        });
+    }
+
+    @Test
+    public void testEmailDuplicate() {
+        Candidate candidate = candidateDao.getAll().getFirst();
+        Candidate candidate2 = Candidate.builder()
+                .fullName("test")
+                .dateOfBirth(LocalDate.now())
+                .gender(0)
+                .graduationYear(LocalDate.now())
+                .phone("0112255")
+                .email(candidate.getEmail())
+                .skill("java")
+                .foreignLanguage("english")
+                .level(3)
+                .cv("test.cv")
+                .allocationStatus(0)
+                .remark("good")
+                .build();
+        assertThrows(Exception.class, () -> {
+            candidateDao.save(candidate2);
+        });
     }
 
     @Test
     public void testGenderValidValues() {
-        Candidate candidate = candidateDao.getById(13);
-        assertTrue(candidate.getGender() == 0 || candidate.getGender() == 1);
+        List<Candidate> candidateList = candidateDao.getAll();
+        candidateList.forEach(candidate -> {
+            assertTrue(candidate.getGender() == 0 || candidate.getGender() == 1);
+        });
+    }
+
+    @Test
+    public void testGenderInvalidValues() {
+        Candidate candidate = Candidate.builder()
+                .fullName("test")
+                .dateOfBirth(LocalDate.now())
+                .graduationYear(LocalDate.now())
+                .phone("011225532")
+                .email("Charlie@gmail.com")
+                .skill("java")
+                .foreignLanguage("english")
+                .level(3)
+                .cv("test.cv")
+                .allocationStatus(0)
+                .remark("good")
+                .build();
+
+        candidate.setGender(4);
+
+        assertThrows(Exception.class, () -> {
+            candidateDao.save(candidate);
+        });
     }
 
     @Test
     public void testLevelValidRange() {
-        Candidate candidate = candidateDao.getById(13);
-        assertTrue(candidate.getLevel() >= 1 && candidate.getLevel() <= 7);
+        List<Candidate> candidateList = candidateDao.getAll();
+        candidateList.forEach(candidate -> {
+            assertTrue(candidate.getLevel() >= 1 && candidate.getLevel() <= 7);
+        });
     }
 
+    @Test
+    public void testLevelInvalidRange() {
+        Candidate candidate = Candidate.builder()
+                .fullName("test")
+                .dateOfBirth(LocalDate.now())
+                .gender(0)
+                .graduationYear(LocalDate.now())
+                .phone("2343221")
+                .email("Puth@gmail.com")
+                .skill("java")
+                .foreignLanguage("english")
+                .level(8)
+                .cv("test.cv")
+                .allocationStatus(0)
+                .remark("good")
+                .build();
+        assertThrows(Exception.class, () -> {
+            candidateDao.save(candidate);
+        });
+    }
 
+    //    a) Find all of the candidate that has skill is 'Angluar’ and skill level is 2.
+    @Test
+    public void testFindSkillAndSkillLevel() {
+        List<Candidate> candidateList = candidateDao.findBySkillAndSkillLevel("Angluar", 2);
+        candidateList.forEach(candidate -> {
+            assertEquals("Angluar", candidate.getSkill());
+            assertEquals(2, candidate.getLevel());
+        });
+    }
 
+    //    b) Find all of the candidate that has foreign language is 'Japanese' and skill is 'Python/ML'.
+    @Test
+    public void testFindSkillAndForeignLanguage() {
+        List<Candidate> candidateList = candidateDao.findByForeignLanguageAndSkill("Japanese", "Python/ML");
+        candidateList.forEach(candidate -> {
+            assertEquals("Python/ML", candidate.getSkill());
+            assertEquals("Japanese", candidate.getForeignLanguage());
+        });
+    }
+
+//c) Find all of the candidate by skill and entry test result (that has skill is ‘Java’ and pass entry test
+//on '1-Oct-2020').
+//d) Find all of the candidate that pass interview on '15-Oct-2020'.
+//e) Update remark is inactive for candidates who do not have either phone, email and cv.
+//f) Create a method to proceed paging operation for Candidate use Hibernate Criteria Query
+//Language.
 }

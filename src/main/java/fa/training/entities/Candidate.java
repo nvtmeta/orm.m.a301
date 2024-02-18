@@ -2,7 +2,7 @@ package fa.training.entities;
 
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UniqueElements;
@@ -34,9 +34,9 @@ public class Candidate {
     private LocalDate dateOfBirth;
 
     //    gender: accepts value 0 (female) and 1 (male) only.
-    @Column(name = "gender", nullable = false)
-    @Range(min = 0, max = 1)
-    private Integer gender;
+    @Column(name = "gender", nullable = false, columnDefinition = "int range 0 to 1")
+    @Size(min = 0, max = 1)
+    private int gender;
 
     @Column(name = "graduation_year", nullable = false)
     @NotNull
@@ -52,16 +52,17 @@ public class Candidate {
     @NotNull
     private String email;
 
-    //o level: skill level of candidate (accepts value range from 1 to 7 only)
     @Column(name = "skill", columnDefinition = "varchar(255)", nullable = false)
     private String skill;
 
     @Column(name = "foreign_language", columnDefinition = "varchar(255)", nullable = false)
     private String foreignLanguage;
 
+    // level: skill level of candidate (accepts value range from 1 to 7 only)
     @Column(name = "level", columnDefinition = "int", nullable = false)
-    @Range(min = 1, max = 7)
-    private Integer level;
+    @Min(value = 1)
+    @Max(value = 7)
+    private int level;
 
     @Column(name = "cv", columnDefinition = "varchar(255)", nullable = false)
     private String cv;

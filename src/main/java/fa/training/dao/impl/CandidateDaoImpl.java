@@ -61,17 +61,17 @@ public class CandidateDaoImpl implements CandidateDao {
 
     @Override
     public List<Candidate> findBySkillAndSkillLevel(String skill, int skillLevel) {
-        try (Session session = HibernateUtils.getCurrentSession()) {
-            TypedQuery<Candidate> query = session.createQuery("FROM Candidate WHERE skill = :skill AND skillLevel = :skillLevel", Candidate.class);
+        try (Session session = HibernateUtils.openSession()) {
+            TypedQuery<Candidate> query = session.createQuery("FROM Candidate WHERE skill = :skill AND level = :level", Candidate.class);
             query.setParameter("skill", skill);
-            query.setParameter("skillLevel", skillLevel);
+            query.setParameter("level", skillLevel);
             return query.getResultList();
         }
     }
 
     @Override
     public List<Candidate> findByForeignLanguageAndSkill(String foreignLanguage, String skill) {
-        try (Session session = HibernateUtils.getCurrentSession()) {
+        try (Session session = HibernateUtils.openSession()) {
             TypedQuery<Candidate> query = session.createQuery("FROM Candidate WHERE foreignLanguage = :foreignLanguage AND skill = :skill", Candidate.class);
             query.setParameter("foreignLanguage", foreignLanguage);
             query.setParameter("skill", skill);
