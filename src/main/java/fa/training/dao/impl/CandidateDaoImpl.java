@@ -8,6 +8,7 @@ import fa.training.utils.HibernateUtils;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -81,56 +82,75 @@ public class CandidateDaoImpl implements CandidateDao {
 
     @Override
     public List<Candidate> findBySkillAndEntryTestResult(String skill, LocalDate entryTestDate) {
-        try (Session session = HibernateUtils.getCurrentSession()) {
-            TypedQuery<Candidate> query = session.createQuery("FROM Candidate WHERE skill = :skill AND entryTest.result = :entryTestDate", Candidate.class);
+        try (Session session = HibernateUtils.openSession()) {
+
+            String jpql = "SELECT c FROM Candidate c " +
+                    "JOIN c.entryTests et " +
+                    "WHERE c.skill = :skill " +
+                    "AND et.date = :entryTestDate " +
+                    "AND et.result = 'pass'";
+
+            TypedQuery<Candidate> query = session.createQuery(jpql, Candidate.class);
             query.setParameter("skill", skill);
             query.setParameter("entryTestDate", entryTestDate);
+
             return query.getResultList();
         }
     }
 
     @Override
     public List<Candidate> findByInterviewDate(LocalDate interviewDate) {
-        try (Session session = HibernateUtils.getCurrentSession()) {
+        try (Session session = HibernateUtils.openSession()) {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaQuery<Candidate> criteriaQuery = builder.createQuery(Candidate.class);
             Root<Candidate> root = criteriaQuery.from(Candidate.class);
-            Join<Candidate, Interview> interviewJoin = root.join("interviews");
+            Join<Candidate, Interview> interviewJoin = root.join("interviews", JoinType.INNER);
             criteriaQuery.select(root);
-            criteriaQuery.where(builder.equal(interviewJoin.get("interviewDate"), interviewDate));
+            criteriaQuery.where(builder.equal(interviewJoin.get("date"), interviewDate));
             return session.createQuery(criteriaQuery).getResultList();
         }
     }
 
     @Override
-    public void updateRemark() {
-        try (Session session = HibernateUtils.getCurrentSession()) {
+    public void updateRemarkInactiveForCandidatesWithoutContactInfo() {
+        try (Session session = HibernateUtils.openSession()) {
             CriteriaBuilder builder = session.getCriteriaBuilder();
             CriteriaUpdate<Candidate> criteriaUpdate = builder.createCriteriaUpdate(Candidate.class);
             Root<Candidate> root = criteriaUpdate.from(Candidate.class);
-            criteriaUpdate.set(root.get("remark"), "inactive");
-            Predicate contactInfoPredicate = builder.or(
-                    builder.isNull(root.get("phone")),
-                    builder.isNull(root.get("email")),
-                    builder.isNull(root.get("cv"))
-            );
-            criteriaUpdate.where(contactInfoPredicate);
-            session.createQuery(criteriaUpdate).executeUpdate();
+
+            criteriaUpdate.set(root.get("remark"), "inactive")
+                    .where(builder.and(
+                            builder.equal(root.get("phone"), ""),
+                            builder.equal(root.get("email"), ""),
+                            builder.equal(root.get("foreignLanguage"), "")
+                    ));
+
+            Transaction transaction = session.beginTransaction();
+            int updatedCount = session.createQuery(criteriaUpdate).executeUpdate();
+            transaction.commit();
+
+
         }
     }
 
-//    @Override
-//    public List<Candidate> getPagedCandidates(int pageNumber, int pageSize) {
-//        try (Session session = HibernateUtils.getCurrentSession()) {
-//            CriteriaBuilder builder = session.getCriteriaBuilder();
-//            CriteriaQuery<Candidate> criteriaQuery = builder.createQuery(Candidate.class);
-//            Root<Candidate> root = criteriaQuery.from(Candidate.class);
-//            criteriaQuery.select(root);
-//            CriteriaQuery<Candidate> pagedCriteriaQuery = criteriaQuery
-//                    .orderBy(builder.asc(root.get("id")))
-//                    .getOrderList((pageNumber - 1) * pageSize)
-//                    .setMaxResults(pageSize);
-//            return session.createQuery(pagedCriteriaQuery).getResultList();
-//        }
-//    }
+
+    public List<Candidate> getCandidatesByPage(int pageNumber, int pageSize) {
+        try (Session session = HibernateUtils.openSession()) {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Candidate> criteriaQuery = builder.createQuery(Candidate.class);
+            Root<Candidate> root = criteriaQuery.from(Candidate.class);
+
+            criteriaQuery.select(root);
+
+            // Ordering candidates by some criteria, e.g., ID
+            criteriaQuery.orderBy(builder.asc(root.get("id")));
+
+            int firstResult = (pageNumber - 1) * pageSize;
+
+            return session.createQuery(criteriaQuery)
+                    .setFirstResult(firstResult)
+                    .setMaxResults(pageSize)
+                    .getResultList();
+        }
+    }
 }

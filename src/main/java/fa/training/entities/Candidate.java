@@ -4,6 +4,7 @@ package fa.training.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.hibernate.validator.constraints.Range;
 import org.hibernate.validator.constraints.UniqueElements;
 
@@ -18,6 +19,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity(name = "Candidate")
 @Table(name = "Candidate", schema = "training")
+@Check(constraints = "level between 1 and 7 and gender between 0 and 1")
 public class Candidate {
 
     @Id
@@ -73,12 +75,13 @@ public class Candidate {
     @Column(name = "remark", columnDefinition = "varchar(1000)", nullable = false)
     private String remark;
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<Interview> interviews;
 
-    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @ToString.Exclude
     private Set<EntryTest> entryTests;
+
 
 }

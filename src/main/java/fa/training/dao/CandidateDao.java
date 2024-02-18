@@ -25,5 +25,7 @@ public interface CandidateDao {
 
     List<Candidate> findByInterviewDate(LocalDate interviewDate);
 
-    void updateRemark();
+    void updateRemarkInactiveForCandidatesWithoutContactInfo();
+
+    List<Candidate> getCandidatesByPage(int pageNumber, int pageSize);
 }
