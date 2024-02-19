@@ -2,7 +2,6 @@ package fa.training.dao.impl;
 
 import fa.training.dao.CandidateDao;
 import fa.training.entities.Candidate;
-import fa.training.entities.EntryTest;
 import fa.training.entities.Interview;
 import fa.training.utils.HibernateUtils;
 import jakarta.persistence.TypedQuery;
@@ -106,7 +105,10 @@ public class CandidateDaoImpl implements CandidateDao {
             Root<Candidate> root = criteriaQuery.from(Candidate.class);
             Join<Candidate, Interview> interviewJoin = root.join("interviews", JoinType.INNER);
             criteriaQuery.select(root);
-            criteriaQuery.where(builder.equal(interviewJoin.get("date"), interviewDate));
+            criteriaQuery.where(
+                    builder.equal(interviewJoin.get("date"), interviewDate),
+                    builder.equal(interviewJoin.get("interviewResult"), "pass")
+            );
             return session.createQuery(criteriaQuery).getResultList();
         }
     }
@@ -122,11 +124,11 @@ public class CandidateDaoImpl implements CandidateDao {
                     .where(builder.and(
                             builder.equal(root.get("phone"), ""),
                             builder.equal(root.get("email"), ""),
-                            builder.equal(root.get("foreignLanguage"), "")
+                            builder.equal(root.get("cv"), "")
                     ));
 
             Transaction transaction = session.beginTransaction();
-            int updatedCount = session.createQuery(criteriaUpdate).executeUpdate();
+            session.createQuery(criteriaUpdate).executeUpdate();
             transaction.commit();
 
 

@@ -19,7 +19,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity(name = "Candidate")
 @Table(name = "Candidate", schema = "training")
-@Check(constraints = "level between 1 and 7 and gender between 0 and 1")
 public class Candidate {
 
     @Id
@@ -36,8 +35,8 @@ public class Candidate {
     private LocalDate dateOfBirth;
 
     //    gender: accepts value 0 (female) and 1 (male) only.
-    @Column(name = "gender", nullable = false, columnDefinition = "int range 0 to 1")
-    @Size(min = 0, max = 1)
+    @Column(name = "gender", nullable = false, columnDefinition = "int")
+    @Check(constraints = "gender IN (0, 1)")
     private int gender;
 
     @Column(name = "graduation_year", nullable = false)
@@ -62,9 +61,12 @@ public class Candidate {
 
     // level: skill level of candidate (accepts value range from 1 to 7 only)
     @Column(name = "level", columnDefinition = "int", nullable = false)
-    @Min(value = 1)
-    @Max(value = 7)
+    @Check(constraints = "level BETWEEN 1 AND 7")
     private int level;
+
+//    @Column(name = "testLevel", columnDefinition = "int")
+//    @Check(constraints = "testLevel BETWEEN 1 AND 7")
+//    private int testLevel;
 
     @Column(name = "cv", columnDefinition = "varchar(255)", nullable = false)
     private String cv;

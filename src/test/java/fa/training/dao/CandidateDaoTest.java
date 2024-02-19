@@ -92,7 +92,7 @@ public class CandidateDaoTest {
     @Test
     public void testSaveNotExist() {
 
-        Candidate candidate = Candidate.builder().build();
+        Candidate candidate = new Candidate();
 
         assertThrows(Exception.class, () -> {
             candidateDao.save(candidate);
@@ -304,9 +304,9 @@ public class CandidateDaoTest {
                 .cv("test.cv")
                 .allocationStatus(0)
                 .remark("good")
+                .gender(4)
                 .build();
 
-        candidate.setGender(4);
 
         assertThrows(Exception.class, () -> {
             candidateDao.save(candidate);
@@ -332,11 +332,12 @@ public class CandidateDaoTest {
                 .email("Puth@gmail.com")
                 .skill("java")
                 .foreignLanguage("english")
-                .level(8)
+                .level(-9)
                 .cv("test.cv")
                 .allocationStatus(0)
                 .remark("good")
                 .build();
+
         assertThrows(Exception.class, () -> {
             candidateDao.save(candidate);
         });

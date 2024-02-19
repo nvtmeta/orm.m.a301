@@ -9,6 +9,23 @@
         <chat>
           <internalId value="e2324010-b6b6-4f4f-9ca0-ca3a236b4070" />
         </chat>
+        <chat>
+          <internalId value="bdeec34b-2705-4f0b-b91f-afdf8088dd8d" />
+        </chat>
+        <chat>
+          <enhancedContext>
+            <enhancedContext>
+              <remoteRepositories>
+                <list>
+                  <remoteRepository>
+                    <remoteUrl value="github.com/nvtmeta/orm.m.a301" />
+                  </remoteRepository>
+                </list>
+              </remoteRepositories>
+            </enhancedContext>
+          </enhancedContext>
+          <internalId value="f8d67b36-7827-4f12-b4d2-bbba8dcfe34d" />
+        </chat>
       </list>
     </chats>
   </component>
