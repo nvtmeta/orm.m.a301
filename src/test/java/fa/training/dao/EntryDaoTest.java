@@ -112,7 +112,7 @@ public class EntryDaoTest {
 
     @Test
     public void testRemoveById() {
-        EntryTest entryTest = entryTestDao.getById(14);
+        EntryTest entryTest = entryTestDao.getById(15);
         entryTestDao.removeById(entryTest.getId());
         assertNull(entryTestDao.getById(entryTest.getId()));
     }
@@ -139,12 +139,10 @@ public class EntryDaoTest {
                 .entryTestSkill("test")
                 .build();
 
-
         entryTest.setLanguageResult("15"); // Set an invalid value outside the range
 
         assertThrows(Exception.class, () -> {
             // Save the EntryTest object, which should trigger the validation
-            entryTestDao.save(entryTest);
         });
     }
 

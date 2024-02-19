@@ -6,7 +6,9 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.Check;
 import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
@@ -38,18 +40,20 @@ public class EntryTest {
     @Column(name = "language_result", columnDefinition = "varchar(255)", nullable = false)
     @Min(0)
     @Max(10)
+    @Check(constraints = "language_result IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)")
     private String languageResult;
 
     @Column(name = "technical_valuator", columnDefinition = "varchar(255)", nullable = false)
     private String technicalValuator;
 
     @Column(name = "technical_result", columnDefinition = "varchar(255)", nullable = false)
-    @Range(min = 0, max = 10)
+    @Check(constraints = "technical_result BETWEEN 0 AND 10")
     private String technicalResult;
 
     //    result: 'pass' or 'fail' value.
     @Column(name = "result", columnDefinition = "varchar(255)", nullable = false)
     @Pattern(regexp = "^(pass|fail)$", message = "Result must be either 'pass' or 'fail'")
+    @Check(constraints = "result IN ('pass', 'fail')")
     private String result;
 
     @Column(name = "remark", columnDefinition = "varchar(1000)", nullable = false)
