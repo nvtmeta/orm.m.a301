@@ -44,12 +44,10 @@ public class Candidate {
     private LocalDate graduationYear;
 
     @Column(name = "phone", columnDefinition = "varchar(255)", nullable = false, unique = true)
-    @UniqueElements
     @NotNull
     private String phone;
 
     @Column(name = "email", columnDefinition = "varchar(255)", nullable = false, unique = true)
-    @UniqueElements
     @NotNull
     private String email;
 
